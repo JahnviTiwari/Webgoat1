@@ -1,24 +1,45 @@
-name: WebGoat SBOM Generation
+name: JavaScript SBOM Generation
 
-on: 
-  workflow_dispatch:
+on:
+  workflow_dispatch:  # This allows the workflow to be manually triggered from the GitHub Actions page
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Run the job on the latest Ubuntu environment
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    # Step 1: Checkout the code
+    - name: Checkout Repository
+      uses: actions/checkout@v4  # Checkout the repository code
+
+    # Step 2: Set up Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
       with:
-        dotnet-version: 8.0.x
+        node-version: '16'  # Specify the version of Node.js to use (adjust to your project requirements)
 
-    #- name: Build
-    #  run: dotnet build Sample.sln --output buildOutput
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        npm install  # Installs the project dependencies
 
-    - name: Upload a Build Artifact
+    # Step 4: Build the JavaScript project (if applicable)
+    - name: Build Project (Optional)
+      run: |
+        npm run build  # Run your build command if the project has a build step
+
+    # Step 5: Generate SBOM using Microsoft's SBOM Tool
+    - name: Generate SBOM using Microsoft SBOM Tool
+      run: |
+        curl -Lo $RUNNER_TEMP/sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
+        chmod +x $RUNNER_TEMP/sbom-tool
+        $RUNNER_TEMP/sbom-tool generate -b ./node_modules -bc . -pn YourProjectName -pv 1.0.0 -ps YourCompany -nsb https://sbom.yourcompany.com -V Verbose
+
+    # Step 6: Upload SBOM and Build Artifacts
+    - name: Upload SBOM and Artifacts
       uses: actions/upload-artifact@v4
       with:
-        path: buildOutput
+        name: javascript-artifacts
+        path: |
+          ./node_modules
+          ./sbom.xml  # If the SBOM is saved to this file, change according to your SBOM tool output location
