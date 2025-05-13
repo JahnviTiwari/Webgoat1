@@ -37,3 +37,4 @@ jobs:
       with:
         name: webgoat-artifacts
         path: ./target  # Uploads the build output
+
