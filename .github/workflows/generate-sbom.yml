@@ -30,8 +30,8 @@ jobs:
         sudo apt-get install -y maven
 
     # Step 5: Build WebGoat with Maven
-    - name: Build WebGoat with Maven
-      run: mvn clean install
+    # - name: Build WebGoat with Maven
+    #  run: mvn clean install
 
     # Step 6: Generate SBOM using Microsoft SBOM Tool
     - name: Generate SBOM using Microsoft SBOM Tool
