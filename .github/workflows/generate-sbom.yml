@@ -1,32 +1,24 @@
 name: WebGoat SBOM Generation
 
-on:
-  workflow_dispatch:  # This triggers the workflow manually from the GitHub Actions page
+on: 
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Run the job on the latest Ubuntu environment
+
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout WebGoat Repository
-      uses: actions/checkout@v4  # Checkout your repository code
-
-    - name: Set up JDK
-      uses: actions/setup-java@v3
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
       with:
-        java-version: '17'  # WebGoat requires Java 17 or later
+        dotnet-version: 8.0.x
 
-    - name: Build WebGoat with Maven
-      run: mvn clean install  # This builds the WebGoat project using Maven
+    - name: Build
+      run: dotnet build Sample.sln --output buildOutput
 
-    - name: Generate SBOM using Microsoft SBOM Tool
-      run: |
-        curl -Lo $RUNNER_TEMP/sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
-        chmod +x $RUNNER_TEMP/sbom-tool
-        $RUNNER_TEMP/sbom-tool generate -b ./target -bc . -pn WebGoat -pv 8.0.0 -ps OWASP -nsb https://sbom.owasp.org -V Verbose
-
-    - name: Upload Build Artifacts and SBOM File
+    - name: Upload a Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: webgoat-artifacts
-        path: ./target  # Uploads the build output and SBOM file
+        path: buildOutput
