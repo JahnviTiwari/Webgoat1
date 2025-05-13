@@ -1,11 +1,12 @@
 name: WebGoat SBOM Generation
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Trigger the workflow manually from GitHub Actions page
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+
+    runs-on: ubuntu-latest  # Use the latest Ubuntu environment for the job
 
     steps:
     # Step 1: Checkout the code
@@ -19,25 +20,26 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # Step 3: Verify the Java version
-    - name: Check Java version
-      run: java -version   # This will print the Java version to the logs
-
-    # Step 4: Install Maven
+    # Step 3: Install Maven
     - name: Install Maven
       run: |
         sudo apt-get update
-        sudo apt-get install -y maven
+        sudo apt-get install -y maven  # Install Maven for building WebGoat
 
-    # Step 5: Build WebGoat with Maven
-    # - name: Build WebGoat with Maven
-    #  run: mvn clean install
+    # Step 4: Build WebGoat with Maven
+    - name: Build WebGoat with Maven
+      run: mvn clean install  # Build the project using Maven
+
+    # Step 5: Check if the 'target' directory exists
+    - name: List build output
+      run: ls -R ./target   # List files in the target directory
 
     # Step 6: Generate SBOM using Microsoft SBOM Tool
     - name: Generate SBOM using Microsoft SBOM Tool
       run: |
         curl -Lo $RUNNER_TEMP/sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
         chmod +x $RUNNER_TEMP/sbom-tool
+        # Generate the SBOM for the build output
         $RUNNER_TEMP/sbom-tool generate -b ./target -bc . -pn WebGoat -pv 8.0.0 -ps OWASP -nsb https://sbom.owasp.org -V Verbose
 
     # Step 7: Upload Build Artifacts and SBOM File
@@ -45,4 +47,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: webgoat-artifacts
-        path: ./target
+        path: ./target  # Uploads everything from the 'target' directory, including SBOM file
