@@ -19,14 +19,14 @@ jobs:
         node-version: '16'  # Specify the version of Node.js to use (adjust to your project requirements)
 
     # Step 3: Install dependencies
-    - name: Install dependencies
-      run: |
-        npm install  # Installs the project dependencies
+    # - name: Install dependencies
+    #  run: |
+     #   npm install  # Installs the project dependencies
 
     # Step 4: Build the JavaScript project (if applicable)
-    - name: Build Project (Optional)
-      run: |
-        npm run build  # Run your build command if the project has a build step
+    #- name: Build Project (Optional)
+     # run: |
+      #  npm run build  # Run your build command if the project has a build step
 
     # Step 5: Generate SBOM using Microsoft's SBOM Tool
     - name: Generate SBOM using Microsoft SBOM Tool
